@@ -34,17 +34,17 @@ func main() {
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(klogFlags)
-	flag.Parse()
 	klog.SetOutput(os.Stdout)
 
+	verbosity := klogFlags.Lookup("v")
+	verbosity.Value.Set(strconv.Itoa(*v))
+
+	flag.Parse()
 	// Get kubernetes config
 	config, err := ukube.GetConfig(*runOutsideCluster)
 	if err != nil {
 		klog.Exit(err)
 	}
-
-	verbosity := klogFlags.Lookup("v")
-	verbosity.Value.Set(strconv.Itoa(*v))
 
 	klog.V(0).Infof("Starting list-ingress...")
 	klog.V(0).Infof("Verbosity level set to %v", klogFlags.Lookup("v").Value)

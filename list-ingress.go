@@ -104,25 +104,62 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		w.Header().Set("Server", "Anonymous Web Server 2.0")
 		w.Header().Set("Content-Type", "text/html")
 
+		// Get all ingresses into IngressList struct
+		myIngressesList, err := c.ExtensionsV1beta1().Ingresses("").List(metav1.ListOptions{})
+		if err != nil {
+			w.WriteHeader(500)
+		}
+		ingresses := GetIngsStruct(myIngressesList)
 
 		// Part after / as a filter
 		query := r.URL.Path[len("/"):]
 
-		//fmt.Fprintf(w, "query: %v", query)
+		var ingInterCnt int // Ingress intersections count
+
 		if query == "" {
 			fmt.Fprintf(w, "Find ingresses in k8s cluster. Please put search keyword as a GET query\n" +
 				"(URL path)<br><br>Examples: \n<br> http://domain/my-ingress-name<br>\n" +
 				"http://domain/ingress-domain <br>\n" +
 				"http://domain/Ingress  (will show all ingresses in the cluster) <br><br>\n\n")
+
+			fmt.Fprintf(w, "<b><font color=\"red\">Ingress intersections</font></b>:<br><br>\n")
+
+			// Find ingress intersections (linear)
+			for _, ingOuter := range ingresses {
+				for _, ingInner := range ingresses {
+					if ingOuter.Name == ingInner.Name {
+						break
+					}
+
+					if areIngressesIntersects(ingOuter, ingInner) {
+						ingInterCnt += 1
+
+						lineA := "" // ingOuter
+						lineB := "" // ingInner
+						for _, host := range ingOuter.Hosts {
+							for _, path := range host.Paths {
+								lineA += `"Namespace: ` + ingOuter.Namespace + ", Ingress: " + ingOuter.Name +
+									", Domain: " + host.Name + ", Path: " + path + `"` + "<br>\n"
+							}
+						}
+						for _, host := range ingInner.Hosts {
+							for _, path := range host.Paths {
+								lineB += `"Namespace: ` + ingInner.Namespace + ", Ingress: " + ingInner.Name +
+									", Domain: " + host.Name + ", Path: " + path + `"` + "<br>\n"
+							}
+						}
+
+						fmt.Fprintf(w, "Ingress A:<br>\n")
+						fmt.Fprintf(w, "%v\n", lineA)
+						fmt.Fprintf(w, "Ingress B:<br>\n")
+						fmt.Fprintf(w, "%v<br>\n", lineB)
+					}
+				}
+			}
+			fmt.Fprintf(w, "\n\n<br<br> Intersections count: <font color=\"red\">%d</font><br>\n", ingInterCnt)
 		}
 
-		// Get all ingresses
-		ingInterface, err := c.ExtensionsV1beta1().Ingresses("").List(metav1.ListOptions{})
-		if err != nil {
-			w.WriteHeader(500)
-		}
-
-		ingresses := GetIngsStruct(ingInterface)
+		// If query is non-empty, make search
 
 		line := ""
 		for _, ingress := range ingresses {
@@ -151,4 +188,43 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 // We need empty function to pass arguments into http.Handle()
 func handle(w http.ResponseWriter, r *http.Request) {
 	return
+}
+
+// areIngressesIntersects compares two Ingresses for host + path intersections
+func areIngressesIntersects(a, b Ingress) bool {
+
+	hostIntersects := false
+	pathIntersects := false
+
+	// Find Ingress host intersection
+	for _, hostA := range a.Hosts {
+		for _, hostB := range b.Hosts {
+
+			// Compare hostnames
+			if hostA.Name == hostB.Name {
+				hostIntersects = true
+
+				// If host intersects, let's check paths
+				for _, pathA := range hostA.Paths {
+					for _, pathB := range hostB.Paths {
+						if pathA == pathB {
+							pathIntersects = true
+							break
+						}
+					}
+					if pathIntersects {
+						break
+					}
+				}
+
+				// Found
+				if hostIntersects && pathIntersects {
+					return true
+				}
+
+			}
+		}
+	}
+
+	return false
 }

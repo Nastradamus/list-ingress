@@ -33,13 +33,15 @@ func main() {
 		"outside of the cluster.")
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
+
+	flag.Parse()
+
 	klog.InitFlags(klogFlags)
 	klog.SetOutput(os.Stdout)
 
 	verbosity := klogFlags.Lookup("v")
 	verbosity.Value.Set(strconv.Itoa(*v))
 
-	flag.Parse()
 	// Get kubernetes config
 	config, err := ukube.GetConfig(*runOutsideCluster)
 	if err != nil {

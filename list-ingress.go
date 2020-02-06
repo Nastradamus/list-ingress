@@ -29,7 +29,7 @@ type Ingress struct {
 
 func main() {
 	v := flag.Int("v", 1, "Verbosity level (klog).")
-	runOutsideCluster := flag.Bool("run-outside-cluster", false, "Set this flag when running " +
+	runOutsideCluster := flag.Bool("run-outside-cluster", false, "Set this flag when running "+
 		"outside of the cluster.")
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
@@ -117,9 +117,9 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		var ingInterCnt int // Ingress intersections count
 
 		if query == "" {
-			fmt.Fprintf(w, "Find ingresses in k8s cluster. Please put search keyword as a GET query\n" +
-				"(URL path)<br><br>Examples: \n<br> http://domain/my-ingress-name<br>\n" +
-				"http://domain/ingress-domain <br>\n" +
+			fmt.Fprintf(w, "Find ingresses in k8s cluster. Please put search keyword as a GET query\n"+
+				"(URL path)<br><br>Examples: \n<br> http://domain/my-ingress-name<br>\n"+
+				"http://domain/ingress-domain <br>\n"+
 				"http://domain/Ingress  (will show all ingresses in the cluster) <br><br>\n\n")
 
 			fmt.Fprintf(w, "<b><font color=\"red\">Ingress intersections</font></b>:<br><br>\n")
@@ -186,6 +186,7 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
+
 // We need empty function to pass arguments into http.Handle()
 func handle(w http.ResponseWriter, r *http.Request) {
 	return

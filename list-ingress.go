@@ -78,10 +78,9 @@ func GetIngsStruct(ingInterface *v1beta1.IngressList) []Ingress {
 		ingsStruct[ingNum].Name = name
 		ingsStruct[ingNum].Namespace = ns
 
-		ruleStruct := Rule{} // think about pointer here
-
 		for _, rule := range ingress.Spec.Rules {
 
+			ruleStruct := Rule{}
 			ruleStruct.Host = rule.Host
 
 			if rule.IngressRuleValue.HTTP != nil {
@@ -90,6 +89,7 @@ func GetIngsStruct(ingInterface *v1beta1.IngressList) []Ingress {
 					ruleStruct.Paths = append(ruleStruct.Paths, pathStruct.Path)
 				}
 			}
+
 			ingsStruct[ingNum].Rules = append(ingsStruct[ingNum].Rules, ruleStruct)
 		}
 	}

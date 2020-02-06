@@ -14,17 +14,17 @@ import (
 	"strings"
 )
 
-// Ingress host
-type Host struct {
-	Name string
+// Ingress rule
+type Rule struct {
+	Host  string
 	Paths []string
 }
 
 // Ingress
 type Ingress struct {
-	Name string
+	Name      string
 	Namespace string
-	Hosts []Host
+	Rules     []Rule
 }
 
 func main() {
@@ -78,20 +78,20 @@ func GetIngsStruct(ingInterface *v1beta1.IngressList) []Ingress {
 		ingsStruct[ingNum].Name = name
 		ingsStruct[ingNum].Namespace = ns
 
-		hostStruct := Host{} // think about pointer here
+		ruleStruct := Rule{} // think about pointer here
 
 		for _, rule := range ingress.Spec.Rules {
-			host := rule.Host
 
-			hostStruct.Name = host
+			ruleStruct.Host = rule.Host
+
 			if rule.IngressRuleValue.HTTP != nil {
 				for _, pathStruct := range rule.IngressRuleValue.HTTP.Paths {
-					//klog.V(0).Infof("Namespace: %q, Ingress: %q. Host: %q, Path: %q", ns, name, host, pathStruct.Path)
-					hostStruct.Paths = append(hostStruct.Paths, pathStruct.Path)
+					//klog.V(0).Infof("Namespace: %q, Ingress: %q. Rule: %q, Path: %q", ns, name, host, pathStruct.Path)
+					ruleStruct.Paths = append(ruleStruct.Paths, pathStruct.Path)
 				}
 			}
+			ingsStruct[ingNum].Rules = append(ingsStruct[ingNum].Rules, ruleStruct)
 		}
-		ingsStruct[ingNum].Hosts = append(ingsStruct[ingNum].Hosts, hostStruct)
 	}
 	return ingsStruct
 }
@@ -136,16 +136,16 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 
 						lineA := "" // ingOuter
 						lineB := "" // ingInner
-						for _, host := range ingOuter.Hosts {
+						for _, host := range ingOuter.Rules {
 							for _, path := range host.Paths {
 								lineA += `"Namespace: ` + ingOuter.Namespace + ", Ingress: " + ingOuter.Name +
-									", Domain: " + host.Name + ", Path: " + path + `"` + "<br>\n"
+									", Domain: " + host.Host + ", Path: " + path + `"` + "<br>\n"
 							}
 						}
-						for _, host := range ingInner.Hosts {
+						for _, host := range ingInner.Rules {
 							for _, path := range host.Paths {
 								lineB += `"Namespace: ` + ingInner.Namespace + ", Ingress: " + ingInner.Name +
-									", Domain: " + host.Name + ", Path: " + path + `"` + "<br>\n"
+									", Domain: " + host.Host + ", Path: " + path + `"` + "<br>\n"
 							}
 						}
 
@@ -161,12 +161,13 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 
 		// If query is non-empty, make search
 
+		// First, get all ingresses slitted into lines
 		line := ""
 		for _, ingress := range ingresses {
-			for _, host := range ingress.Hosts {
+			for _, host := range ingress.Rules {
 				for _, path := range host.Paths {
 					line += `"Namespace: ` + ingress.Namespace + ", Ingress: " + ingress.Name +
-						", Domain: " + host.Name + ", Path: " + path + `"` + "<br>\n"
+						", Domain: " + host.Host + ", Path: " + path + `"` + "<br>\n"
 				}
 			}
 		}
@@ -197,11 +198,11 @@ func areIngressesIntersects(a, b Ingress) bool {
 	pathIntersects := false
 
 	// Find Ingress host intersection
-	for _, hostA := range a.Hosts {
-		for _, hostB := range b.Hosts {
+	for _, hostA := range a.Rules {
+		for _, hostB := range b.Rules {
 
 			// Compare hostnames
-			if hostA.Name == hostB.Name {
+			if hostA.Host == hostB.Host {
 				hostIntersects = true
 
 				// If host intersects, let's check paths

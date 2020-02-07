@@ -1,5 +1,5 @@
 # list-ingress
-A simple http application which helps to find all Ingresses in the cluster (helps you find intersections)  
+A simple "Ingress search engine" which helps to find Ingresses and their intersections inside your Kubernetes cluster. 
 It's ready to run inside or outside k8s cluster.
 
 ### Example of usage:

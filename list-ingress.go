@@ -164,36 +164,36 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		// If query is non-empty, make search
 
 		// First, get all ingresses slitted into lines
-		line := ""
+		builder := strings.Builder{}
 		for _, ingress := range ingresses {
 			for _, host := range ingress.Rules {
 				for _, path := range host.Paths {
-					line += "<tr>"
-					line += "<td>"
-					line += ingress.Namespace
-					line += "</td>"
+					builder.WriteString("<tr>")
+					builder.WriteString("<td>")
+					builder.WriteString(ingress.Namespace)
+					builder.WriteString("</td>")
 
-					line += "<td>"
-					line += ingress.Name
-					line += "</td>"
+					builder.WriteString("<td>")
+					builder.WriteString(ingress.Name)
+					builder.WriteString("</td>")
 
-					line += "<td>"
-					line += host.Host
-					line += "</td>"
+					builder.WriteString("<td>")
+					builder.WriteString(host.Host)
+					builder.WriteString("</td>")
 
-					line += "<td>"
-					line += path
-					line += "</td>"
+					builder.WriteString("<td>")
+					builder.WriteString(path)
+					builder.WriteString("</td>")
 
-					line += "</tr>\n"
+					builder.WriteString("</tr>\n")
 				}
 			}
 		}
+		line := builder.String()
 
 		// Full text search :-)
 		if query != "" {
 			fmt.Fprintf(w, "<br>Query: %q <br><br>", query)
-
 			fmt.Fprintf(w, "<table>")
 
 			writeTableHead(&w)

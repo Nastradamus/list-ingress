@@ -164,31 +164,33 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		// If query is non-empty, make search
 
 		// First, get all ingresses slitted into lines
-		line := ""
+		builder := strings.Builder{}
 		for _, ingress := range ingresses {
 			for _, host := range ingress.Rules {
 				for _, path := range host.Paths {
-					line += "<tr>"
-					line += "<td>"
-					line += ingress.Namespace
-					line += "</td>"
 
-					line += "<td>"
-					line += ingress.Name
-					line += "</td>"
+					builder.WriteString("<tr>")
+					builder.WriteString("<td>")
+					builder.WriteString(ingress.Namespace)
+					builder.WriteString("</td>")
 
-					line += "<td>"
-					line += host.Host
-					line += "</td>"
+					builder.WriteString("<td>")
+					builder.WriteString(ingress.Name)
+					builder.WriteString("</td>")
 
-					line += "<td>"
-					line += path
-					line += "</td>"
+					builder.WriteString("<td>")
+					builder.WriteString(host.Host)
+					builder.WriteString("</td>")
 
-					line += "</tr>\n"
+					builder.WriteString("<td>")
+					builder.WriteString(path)
+					builder.WriteString("</td>")
+
+					builder.WriteString("</tr>\n")
 				}
 			}
 		}
+		line := builder.String()
 
 		// Full text search :-)
 		if query != "" {
@@ -196,7 +198,7 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 
 			fmt.Fprintf(w, "<table>")
 
-			writeTableHead(w)
+			writeTableHead(&w)
 
 			lines := strings.Split(line, "\n")
 			for _, curLine := range lines {
@@ -211,28 +213,28 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 	})
 }
 
-func writeTableHead(w http.ResponseWriter) {
-	fmt.Fprintf(w, "<head>")
-	fmt.Fprintf(w, "<tr>")
+func writeTableHead(w *http.ResponseWriter) {
+	fmt.Fprintf(*w, "<head>")
+	fmt.Fprintf(*w, "<tr>")
 
-	fmt.Fprintf(w, "<td>")
-	fmt.Fprintf(w, "Namespace")
-	fmt.Fprintf(w, "</td>")
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Namespace")
+	fmt.Fprintf(*w, "</td>")
 
-	fmt.Fprintf(w, "<td>")
-	fmt.Fprintf(w, "Ingress")
-	fmt.Fprintf(w, "</td>")
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Ingress")
+	fmt.Fprintf(*w, "</td>")
 
-	fmt.Fprintf(w, "<td>")
-	fmt.Fprintf(w, "Domain")
-	fmt.Fprintf(w, "</td>")
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Domain")
+	fmt.Fprintf(*w, "</td>")
 
-	fmt.Fprintf(w, "<td>")
-	fmt.Fprintf(w, "Path")
-	fmt.Fprintf(w, "</td>")
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Path")
+	fmt.Fprintf(*w, "</td>")
 
-	fmt.Fprintf(w, "</tr>")
-	fmt.Fprintf(w, "</head>")
+	fmt.Fprintf(*w, "</tr>")
+	fmt.Fprintf(*w, "</head>")
 }
 
 // We need empty function to pass arguments into http.Handle()

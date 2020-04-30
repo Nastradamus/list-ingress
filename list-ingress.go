@@ -3,15 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	ukube "github.com/Nastradamus/useless-operator/pkg/ukubernetes"
-	"k8s.io/api/extensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/klog"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"k8s.io/api/extensions/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/klog"
+
+	ukube "github.com/Nastradamus/useless-operator/pkg/ukubernetes"
 )
 
 // Ingress rule
@@ -166,8 +168,24 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		for _, ingress := range ingresses {
 			for _, host := range ingress.Rules {
 				for _, path := range host.Paths {
-					line += `"Namespace: ` + ingress.Namespace + ", Ingress: " + ingress.Name +
-						", Domain: " + host.Host + ", Path: " + path + `"` + "<br>\n"
+					line += "<tr>"
+					line += "<td>"
+					line += ingress.Namespace
+					line += "</td>"
+
+					line += "<td>"
+					line += ingress.Name
+					line += "</td>"
+
+					line += "<td>"
+					line += host.Host
+					line += "</td>"
+
+					line += "<td>"
+					line += path
+					line += "</td>"
+
+					line += "</tr>\n"
 				}
 			}
 		}
@@ -175,16 +193,46 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		// Full text search :-)
 		if query != "" {
 			fmt.Fprintf(w, "<br>Query: %q <br><br>", query)
+
+			fmt.Fprintf(w, "<table>")
+
+			writeTableHead(&w)
+
 			lines := strings.Split(line, "\n")
 			for _, curLine := range lines {
 				if strings.Contains(curLine, query) {
 					fmt.Fprint(w, curLine)
 				}
 			}
+			fmt.Fprintf(w, "</table>")
 		}
 
 		h.ServeHTTP(w, r)
 	})
+}
+
+func writeTableHead(w *http.ResponseWriter) {
+	fmt.Fprintf(*w, "<head>")
+	fmt.Fprintf(*w, "<tr>")
+
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Namespace")
+	fmt.Fprintf(*w, "</td>")
+
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Ingress")
+	fmt.Fprintf(*w, "</td>")
+
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Domain")
+	fmt.Fprintf(*w, "</td>")
+
+	fmt.Fprintf(*w, "<td>")
+	fmt.Fprintf(*w, "Path")
+	fmt.Fprintf(*w, "</td>")
+
+	fmt.Fprintf(*w, "</tr>")
+	fmt.Fprintf(*w, "</head>")
 }
 
 // We need empty function to pass arguments into http.Handle()

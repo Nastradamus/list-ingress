@@ -14,3 +14,6 @@ I0203 15:09:37.411839    5978 list-ingress.go:62] Starting HTTP server at http:/
 
 ### In browser:
 ![Screenshot](https://github.com/Nastradamus/list-ingress/raw/master/list-ingress1.png)
+
+### Find ingresses by keyword (full text search):
+![Screenshot](https://github.com/Nastradamus/list-ingress/raw/master/list-ingress2.png)

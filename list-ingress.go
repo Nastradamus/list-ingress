@@ -168,6 +168,7 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		for _, ingress := range ingresses {
 			for _, host := range ingress.Rules {
 				for _, path := range host.Paths {
+
 					builder.WriteString("<tr>")
 					builder.WriteString("<td>")
 					builder.WriteString(ingress.Namespace)
@@ -194,6 +195,7 @@ func wrapper(h http.Handler, c *kubernetes.Clientset) http.Handler {
 		// Full text search :-)
 		if query != "" {
 			fmt.Fprintf(w, "<br>Query: %q <br><br>", query)
+
 			fmt.Fprintf(w, "<table>")
 
 			writeTableHead(&w)

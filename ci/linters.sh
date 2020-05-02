@@ -8,9 +8,6 @@ if [ "$unformatted" ]; then
   exit 1
 fi
 
-printf "\n*** RUN go vet ***\n"
-go vet ./...
-
 printf "\n*** RUN golangci-lint ***\n"
 golangci-lint run
 

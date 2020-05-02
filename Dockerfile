@@ -3,10 +3,8 @@ FROM golang:1.13.5-alpine3.11 as build-env
 
 RUN mkdir /MultiStage
 WORKDIR /MultiStage
-COPY go.mod .
-COPY go.sum .
 
-COPY list-ingress.go .
+COPY . .
 
 # Build the binary
 ENV GO111MODULE=on

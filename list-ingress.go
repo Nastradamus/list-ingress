@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"strconv"
 
 	"k8s.io/klog"
 
@@ -15,8 +16,6 @@ import (
 func main() {
 	config := initConfig()
 	printDiagMessage(config)
-
-	klog.SetOutput(os.Stdout)
 
 	ingressService := k8sservice.NewIngressService(config.K8sserviceConfig)
 
@@ -37,17 +36,16 @@ func initConfig() app.Config {
 		false,
 		"Set this flag when running outside of the cluster.",
 	)
+
+	verbosity := flag.Int("v", 1, "Verbosity level (klog).")
 	flag.Parse()
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(klogFlags)
-	for i, arg := range os.Args {
-		if arg == klogFlags.Name() {
-			err := klogFlags.Parse(os.Args[i+1:])
-			if err != nil {
-				klog.Exit(err)
-			}
-		}
+	klog.SetOutput(os.Stdout)
+	err := klogFlags.Lookup("v").Value.Set(strconv.Itoa(*verbosity))
+	if err != nil {
+		klog.Exit(err)
 	}
 
 	return app.Config{

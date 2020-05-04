@@ -1,7 +1,9 @@
 package app
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -51,12 +53,21 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 		IntersectionIngresses: intersections,
 	}
 
-	err = a.MainTemplate.Execute(w, vd)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := a.MainTemplate.Execute(&buf, vd); err != nil {
 		klog.Exit(err)
+	} else {
+		_, err := io.Copy(w, &buf)
+		if err != nil {
+			klog.Exit(err)
+		}
 	}
+	//err = a.MainTemplate.Execute(w, vd)
+	//if err != nil {
+	//	klog.Exit(err)
+	//}
 
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 }
 
 func getTemplate(path string) *template.Template {

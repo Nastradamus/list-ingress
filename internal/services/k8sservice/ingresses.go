@@ -132,11 +132,7 @@ func getIngressData(ingInterface *v1beta1.IngressList) []core.IngressData {
 
 	ingresses = make([]core.IngressData, 0, 100000)
 
-	return []core.IngressData{
-		{Name: "asdsd asd as ", Namespace: "3", Host: "5", Path: "5", RewriteTarget: "3"},
-	}
-
-	//return ingresses
+	return ingresses
 }
 
 func filterIngresses(ingresses []core.IngressData, query string) []core.IngressData {

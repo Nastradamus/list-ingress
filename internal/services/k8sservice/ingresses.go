@@ -130,8 +130,6 @@ func getIngressData(ingInterface *v1beta1.IngressList) []core.IngressData {
 		}
 	}
 
-	ingresses = make([]core.IngressData, 0, 100000)
-
 	return ingresses
 }
 

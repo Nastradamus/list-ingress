@@ -55,7 +55,12 @@
 
             const searchField = document.getElementById("search-field")
 
-            window.location = window.location.origin + "/" + searchField.value
+            let url = window.location.href
+            let to = url.lastIndexOf('/');
+            to = to == -1 ? url.length : to + 1;
+            url = url.substring(0, to);
+
+            window.location = url + searchField.value
         }
 
         function setFocusOnLastChar(input) {
@@ -70,7 +75,7 @@
             setFocusOnLastChar(document.getElementById("search-field"))
 
             let domainEls = document.getElementsByClassName("domain-subst")
-            Array.from(domainEls).forEach(el => el.textContent = window.location.origin)
+            Array.from(domainEls).forEach(el => el.textContent = window.location.href)
         });
     </script>
 </head>
@@ -107,11 +112,11 @@
                     <div class="column">
                         <strong>Examples:</strong>
                         <p>
-                            <span class="domain-subst">http://your_domain</span>/my-ingress-name
+                            <span class="domain-subst">http://your_domain/</span>my-ingress-name
                             <br>
-                            <span class="domain-subst">http://your_domain</span>/ingress-domain
+                            <span class="domain-subst">http://your_domain/</span>ingress-domain
                             <br>
-                            <span class="domain-subst">http://your_domain</span>/Ingress (will show all ingresses in the cluster)
+                            <span class="domain-subst">http://your_domain/</span>Ingress (will show all ingresses in the cluster)
                         </p>
                     </div>
                 </div>

@@ -18,6 +18,14 @@
         table.bordered tr>td:not(:last-child) {
             border-right: 0.1rem solid #e1e1e1;
         }
+        table.bordered td,
+        table.bordered th {
+            padding: 1.2rem 1.5rem;
+        }
+        table.bordered th.cell-number,
+        table.bordered td.cell-number {
+            width: 1rem
+        }
 
         .top-nav {
             padding-top: 1rem;
@@ -126,11 +134,12 @@
                     <table class="stripped bordered intersection-table">
                         <thead>
                             <tr>
-                                <th class="text-center text-red" colspan="5">
+                                <th class="text-center text-red" colspan="6">
                                     Ingresses intersections: {{(len .IntersectionIngresses)}}
                                 </th>
                             </tr>
                             <tr>
+                                <th class="text-center cell-number">#</th>
                                 <th>Namespace</th>
                                 <th>Ingress</th>
                                 <th>Domain</th>
@@ -139,8 +148,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{range .IntersectionIngresses}}
+                            {{range $index, $ingress :=.IntersectionIngresses}}
                                 <tr>
+                                    <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
                                     <td>{{.Host}}</td>
@@ -156,9 +166,10 @@
                 <table class="stripped bordered">
                     <thead>
                         <tr>
-                            <th class="text-center" colspan="5">Ingresses</th>
+                            <th class="text-center" colspan="6">Ingresses</th>
                         </tr>
                         <tr>
+                            <th class="text-center cell-number">#</th>
                             <th>Namespace</th>
                             <th>Ingress</th>
                             <th>Domain</th>
@@ -168,8 +179,9 @@
                     </thead>
                     {{if .Ingresses}}
                         <tbody>
-                            {{range .Ingresses}}
+                            {{range $index, $ingress :=.Ingresses}}
                                 <tr>
+                                    <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
                                     <td>{{.Host}}</td>

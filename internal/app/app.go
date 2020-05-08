@@ -64,6 +64,10 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a App) HandleHealthCheck(w http.ResponseWriter, _ *http.Request) {
+       w.WriteHeader(http.StatusOK)
+}
+
 func getTemplate(path string) *template.Template {
 	file, err := parcello.Open(path)
 	if err != nil {

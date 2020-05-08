@@ -22,7 +22,7 @@ func main() {
 	app := app.NewApp(ingressService)
 
 	http.HandleFunc("/", app.HandleRoot)
-	http.HandleFunc("/healthcheck", app.HandleHealthCheck)
+	http.HandleFunc("/healthz", app.HandleHealthCheck)
 
 	klog.Infof("Starting HTTP server at http://0.0.0.0:8080")
 	err := http.ListenAndServe(":8080", nil)

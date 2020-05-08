@@ -13,7 +13,7 @@ FROM golang:1.13.5-alpine3.11 as build-deps
 RUN mkdir /MultiStage
 WORKDIR /MultiStage
 COPY --from=download-deps /MultiStage/ /MultiStage/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /list-ingress
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /MultiStage/list-ingress
 COPY . .
 # 3) Run pre-builded app in alpine
 FROM alpine:3.11.3

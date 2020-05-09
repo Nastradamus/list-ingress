@@ -51,33 +51,24 @@ func (is IngressService) GetIngresses() ([]core.IngressData, error) {
 
 	ingresses := getIngressData(myIngressesList)
 
-	sort.Slice(ingresses, makeIngressSorter(ingresses))
-
 	return ingresses, nil
 }
 
-func (is IngressService) GetFilteredIngresses(filter string) ([]core.IngressData, error) {
-	ingresses, err := is.GetIngresses()
-	if err != nil {
-		return nil, err
-	}
-
-	return filterIngresses(ingresses, filter), nil
-}
-
 func (is IngressService) GetFilteredIngressesWIntersections(filter string) ([]core.IngressData, []core.IngressData, error) {
-	ingresses, err := is.GetFilteredIngresses(filter)
+	ingresses, err := is.GetIngresses()
 	if err != nil {
 		return nil, nil, err
 	}
 
+	ingresses = filterIngresses(ingresses, filter)
 	intersections := findIntersections(ingresses)
+	sort.Slice(ingresses, makeIngressSorter(ingresses))
 
 	return ingresses, intersections, nil
 }
 
-// Input ingresses must be sorted!
 func findIntersections(ingresses []core.IngressData) []core.IngressData {
+	sort.Slice(ingresses, makeIngressIntersectionSorter(ingresses))
 	intersections := make([]core.IngressData, 0)
 	prevAdded := false
 
@@ -172,6 +163,16 @@ func makeIngressSorter(ingresses []core.IngressData) func(i, j int) bool {
 		default:
 			return ingresses[i].Namespace < ingresses[j].Namespace
 		}
+	}
+}
+
+func makeIngressIntersectionSorter(ingresses []core.IngressData) func(i, j int) bool {
+	return func(i, j int) bool {
+		if ingresses[i].Host == ingresses[j].Host {
+			return ingresses[i].Path < ingresses[j].Path
+		}
+
+		return ingresses[i].Host < ingresses[j].Host
 	}
 }
 

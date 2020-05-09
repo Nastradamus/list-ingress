@@ -13,6 +13,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/Nastradamus/list-ingress/internal/services/k8sservice"
+	"github.com/Nastradamus/list-ingress/internal/tmplutils"
 )
 
 const (
@@ -65,7 +66,7 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a App) HandleHealthCheck(w http.ResponseWriter, _ *http.Request) {
-       w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 }
 
 func getTemplate(path string) *template.Template {
@@ -78,10 +79,8 @@ func getTemplate(path string) *template.Template {
 		klog.Exit(err)
 	}
 
-	tmpl, err := template.New("index").Parse(string(index))
-	if err != nil {
-		klog.Exit(err)
-	}
+	fns := template.FuncMap{"inc": tmplutils.Inc}
+	tmpl := template.Must(template.New("index").Funcs(fns).Parse(string(index)))
 
 	return tmpl
 }

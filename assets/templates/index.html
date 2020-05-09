@@ -1,3 +1,9 @@
+{{define "kubeDashLinkTmpl"}}
+    <a href="{{kubeDashLink .ing}}">
+        {{.title}}
+    </a>
+{{end}}
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -172,8 +178,20 @@
                                     <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
-                                    <td>{{.Host}}</td>
-                                    <td>{{.Path}}</td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Host}}
+                                        {{else}}
+                                            {{.Host}}
+                                        {{end}}
+                                    </td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Path}}
+                                        {{else}}
+                                            {{.Path}}
+                                        {{end}}
+                                    </td>
                                     <td>{{.RewriteTarget}}</td>
                                 </tr>
                             {{end}}
@@ -203,8 +221,20 @@
                                     <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
-                                    <td>{{.Host}}</td>
-                                    <td>{{.Path}}</td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Host}}
+                                        {{else}}
+                                            {{.Host}}
+                                        {{end}}
+                                    </td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Path}}
+                                        {{else}}
+                                            {{.Path}}
+                                        {{end}}
+                                    </td>
                                     <td>{{.RewriteTarget}}</td>
                                 </tr>
                             {{end}}

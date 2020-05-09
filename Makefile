@@ -16,4 +16,4 @@ lint:
 	${CI_SCRIPTS_PATH}/linters.sh
 
 run-local-outside:
-	go build && ./list-ingress -run-outside-cluster -v 1 -kube-dash-url http://xxx.com
+	go build && ./list-ingress -run-outside-cluster -v 1 -kube-dash-url http://some.com

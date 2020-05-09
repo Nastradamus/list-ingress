@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
         /*!
         * Milligram v1.3.0
@@ -19,6 +20,16 @@
             border-right: 0.1rem solid #e1e1e1;
         }
 
+        table.bordered td,
+        table.bordered th {
+            padding: 1.2rem 1.5rem;
+        }
+
+        table.bordered th.cell-number,
+        table.bordered td.cell-number {
+            width: 1rem
+        }
+
         .top-nav {
             padding-top: 1rem;
             padding-bottom: 1rem;
@@ -33,6 +44,7 @@
             width: 100%;
             z-index: 1;
         }
+
         .top-nav .header-form {margin-bottom: 0}
         .top-nav .header-form fieldset {margin-bottom: 0}
         .top-nav .header-form input {margin-bottom: 0}
@@ -40,9 +52,16 @@
             background-color: #ffffff;
             font-size: 1.5rem;
         }
+        .top-nav .main-link-logo {
+            margin-bottom: 0;
+            font-size: 2rem;
+            font-weight: 400;
+        }
+
         .main-content {margin-top: 10rem}
         .text-center {text-align: center}
         .text-red {color: #ff0000}
+
         .intersection-table {
             border-top: 0.1rem solid #ff0000;
             border-bottom: 0.1rem solid #ff0000;
@@ -50,17 +69,19 @@
 
     </style>
     <script language="javascript" type="text/javascript">
+        function getBaseURL(url) {
+            let to = url.lastIndexOf('/');
+            to = to == -1 ? url.length : to + 1;
+
+            return url.substring(0, to);
+        }
+
         function onSubmit(event){
             event.preventDefault()
 
             const searchField = document.getElementById("search-field")
 
-            let url = window.location.href
-            let to = url.lastIndexOf('/');
-            to = to == -1 ? url.length : to + 1;
-            url = url.substring(0, to);
-
-            window.location = url + searchField.value
+            window.location = getBaseURL(window.location.href) + searchField.value
         }
 
         function setFocusOnLastChar(input) {
@@ -69,22 +90,28 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById('main_form');
+            const form = document.getElementById('main-form');
             form.addEventListener('submit', onSubmit);
 
             setFocusOnLastChar(document.getElementById("search-field"))
 
             let domainEls = document.getElementsByClassName("domain-subst")
             Array.from(domainEls).forEach(el => el.textContent = window.location.href)
+
+            let mainLinkLogo = document.getElementById("main-link-logo")
+            mainLinkLogo.setAttribute("href", getBaseURL(window.location.href))
         });
     </script>
 </head>
 <body>
     <header class="top-nav">
         <section class="container">
-            <form id="main_form" class="header-form">
+            <form id="main-form" class="header-form">
                 <fieldset>
                     <div class="row">
+                        <div class="column column-10">
+                            <a id="main-link-logo" class="button button-clear main-link-logo" href="/">INGS</a>
+                        </div>
                         <div class="column">
                             <input class="search-field"
                                    id="search-field"
@@ -126,11 +153,12 @@
                     <table class="stripped bordered intersection-table">
                         <thead>
                             <tr>
-                                <th class="text-center text-red" colspan="5">
+                                <th class="text-center text-red" colspan="6">
                                     Ingresses intersections: {{(len .IntersectionIngresses)}}
                                 </th>
                             </tr>
                             <tr>
+                                <th class="text-center cell-number">#</th>
                                 <th>Namespace</th>
                                 <th>Ingress</th>
                                 <th>Domain</th>
@@ -139,8 +167,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{range .IntersectionIngresses}}
+                            {{range $index, $ingress :=.IntersectionIngresses}}
                                 <tr>
+                                    <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
                                     <td>{{.Host}}</td>
@@ -156,9 +185,10 @@
                 <table class="stripped bordered">
                     <thead>
                         <tr>
-                            <th class="text-center" colspan="5">Ingresses</th>
+                            <th class="text-center" colspan="6">Ingresses</th>
                         </tr>
                         <tr>
+                            <th class="text-center cell-number">#</th>
                             <th>Namespace</th>
                             <th>Ingress</th>
                             <th>Domain</th>
@@ -168,8 +198,9 @@
                     </thead>
                     {{if .Ingresses}}
                         <tbody>
-                            {{range .Ingresses}}
+                            {{range $index, $ingress :=.Ingresses}}
                                 <tr>
+                                    <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
                                     <td>{{.Name}}</td>
                                     <td>{{.Host}}</td>

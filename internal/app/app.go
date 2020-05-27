@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/phogolabs/parcello"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog"
 
 	"github.com/Nastradamus/list-ingress/internal/services/k8sservice"
@@ -22,16 +21,18 @@ const (
 
 type App struct {
 	IngressService *k8sservice.IngressService
-	KClientSet     *kubernetes.Clientset
 	MainTemplate   *template.Template
+	Config         Config
 }
 
-func NewApp(ingressService *k8sservice.IngressService) *App {
-	tmpl := getTemplate(templatePath)
+func NewApp(config Config) *App {
+	tmpl := getTemplate(templatePath, config)
+	ingressService := k8sservice.NewIngressService(config.K8sserviceConfig)
 
 	return &App{
 		IngressService: ingressService,
 		MainTemplate:   tmpl,
+		Config:         config,
 	}
 }
 
@@ -50,6 +51,7 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 
 	vd := ViewData{
 		Search:                query,
+		KubeDashURL:           a.Config.KubeDashURL,
 		Ingresses:             ingresses,
 		IntersectionIngresses: intersections,
 	}
@@ -69,7 +71,7 @@ func (a App) HandleHealthCheck(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func getTemplate(path string) *template.Template {
+func getTemplate(path string, config Config) *template.Template {
 	file, err := parcello.Open(path)
 	if err != nil {
 		klog.Exit(err)
@@ -79,7 +81,11 @@ func getTemplate(path string) *template.Template {
 		klog.Exit(err)
 	}
 
-	fns := template.FuncMap{"inc": tmplutils.Inc}
+	fns := template.FuncMap{
+		"inc":          tmplutils.Inc,
+		"kubeDashLink": tmplutils.MakeKubeDashLink(config.KubeDashURL),
+		"dict":         tmplutils.Dict,
+	}
 	tmpl := template.Must(template.New("index").Funcs(fns).Parse(string(index)))
 
 	return tmpl

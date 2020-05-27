@@ -17,9 +17,7 @@ func main() {
 	config := initConfig()
 	printDiagMessage(config)
 
-	ingressService := k8sservice.NewIngressService(config.K8sserviceConfig)
-
-	app := app.NewApp(ingressService)
+	app := app.NewApp(config)
 
 	http.HandleFunc("/", app.HandleRoot)
 	http.HandleFunc("/healthz", app.HandleHealthCheck)
@@ -38,6 +36,12 @@ func initConfig() app.Config {
 		"Set this flag when running outside of the cluster.",
 	)
 
+	kubeDashURL := flag.String(
+		"kube-dash-url",
+		"",
+		"Base URL of kubernetes dashboard",
+	)
+
 	verbosity := flag.Int("v", 1, "Verbosity level (klog).")
 	flag.Parse()
 
@@ -54,10 +58,12 @@ func initConfig() app.Config {
 			RunOutsideCluster: *runOutsideCluster,
 		},
 		LoggerFlags: *klogFlags,
+		KubeDashURL: *kubeDashURL,
 	}
 }
 
 func printDiagMessage(c app.Config) {
 	klog.V(0).Infof("Starting list-ingress...")
 	klog.V(0).Infof("Verbosity level set to %v", c.LoggerFlags.Lookup("v").Value)
+	klog.V(0).Infof("Kubernetes dashboard base url: %v", c.KubeDashURL)
 }

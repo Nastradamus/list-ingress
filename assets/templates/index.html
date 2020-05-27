@@ -1,3 +1,9 @@
+{{define "kubeDashLinkTmpl"}}
+    <a href="{{kubeDashLink .ing}}" target="_blank">
+        {{.title}}
+    </a>
+{{end}}
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -171,9 +177,19 @@
                                 <tr>
                                     <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
-                                    <td>{{.Name}}</td>
-                                    <td>{{.Host}}</td>
-                                    <td>{{.Path}}</td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Name}}
+                                        {{else}}
+                                            {{.Name}}
+                                        {{end}}
+                                    </td>
+                                    <td>
+                                        {{.Host}}
+                                    </td>
+                                    <td>
+                                        {{.Path}}
+                                    </td>
                                     <td>{{.RewriteTarget}}</td>
                                 </tr>
                             {{end}}
@@ -202,9 +218,19 @@
                                 <tr>
                                     <td>{{inc $index}}</td>
                                     <td>{{.Namespace}}</td>
-                                    <td>{{.Name}}</td>
-                                    <td>{{.Host}}</td>
-                                    <td>{{.Path}}</td>
+                                    <td>
+                                        {{if $.KubeDashURL}}
+                                            {{template "kubeDashLinkTmpl" dict "ing" . "title" .Name}}
+                                        {{else}}
+                                            {{.Name}}
+                                        {{end}}
+                                    </td>
+                                    <td>
+                                        {{.Host}}
+                                    </td>
+                                    <td>
+                                        {{.Path}}
+                                    </td>
                                     <td>{{.RewriteTarget}}</td>
                                 </tr>
                             {{end}}

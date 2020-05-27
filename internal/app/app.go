@@ -40,7 +40,7 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Server", "Anonymous Web Server 2.0")
 	w.Header().Set("Content-Type", "text/html")
 
-	query := strings.TrimPrefix(r.URL.Path, "/")
+	query := strings.TrimPrefix(r.URL.Path, a.Config.BasePath)
 
 	ingresses, intersections, err := a.IngressService.GetFilteredIngressesWIntersections(query)
 	if err != nil {
@@ -52,6 +52,7 @@ func (a *App) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	vd := ViewData{
 		Search:                query,
 		KubeDashURL:           a.Config.KubeDashURL,
+		BasePath:              a.Config.BasePath,
 		Ingresses:             ingresses,
 		IntersectionIngresses: intersections,
 	}

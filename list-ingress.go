@@ -36,6 +36,8 @@ func initConfig() app.Config {
 		"Set this flag when running outside of the cluster.",
 	)
 
+	basePath := flag.String("base-path", "/", "Set this flag for proper redirect on search")
+
 	kubeDashURL := flag.String(
 		"kube-dash-url",
 		"",
@@ -57,6 +59,7 @@ func initConfig() app.Config {
 		K8sserviceConfig: k8sservice.Config{
 			RunOutsideCluster: *runOutsideCluster,
 		},
+		BasePath:    *basePath,
 		LoggerFlags: *klogFlags,
 		KubeDashURL: *kubeDashURL,
 	}

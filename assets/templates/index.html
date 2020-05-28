@@ -75,11 +75,10 @@
 
     </style>
     <script language="javascript" type="text/javascript">
-        function getBaseURL(url) {
-            let to = url.lastIndexOf('/');
-            to = to == -1 ? url.length : to + 1;
+        function getBaseURL() {
+            let basePath = {{.BasePath}}
 
-            return url.substring(0, to);
+            return window.location.origin + basePath
         }
 
         function onSubmit(event){
@@ -87,7 +86,7 @@
 
             const searchField = document.getElementById("search-field")
 
-            window.location = getBaseURL(window.location.href) + searchField.value
+            window.location = getBaseURL() + searchField.value
         }
 
         function setFocusOnLastChar(input) {
@@ -105,7 +104,7 @@
             Array.from(domainEls).forEach(el => el.textContent = window.location.href)
 
             let mainLinkLogo = document.getElementById("main-link-logo")
-            mainLinkLogo.setAttribute("href", getBaseURL(window.location.href))
+            mainLinkLogo.setAttribute("href", getBaseURL())
         });
     </script>
 </head>
@@ -238,7 +237,7 @@
                     {{else}}
                         <tbody>
                             <tr>
-                                <td class="text-center" colspan="5">NOT FOUND</td>
+                                <td class="text-center" colspan="6">NOT FOUND</td>
                             </tr>
                         </tbody>
                     {{end}}
